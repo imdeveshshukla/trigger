@@ -1,7 +1,8 @@
 
 import { Kafka } from "kafkajs";
-
+import { PrismaClient } from "@prisma/client";
 const TOPIC_NAME = "zap-events"
+const prisma = new PrismaClient();
 
 const kafka = new Kafka({
     clientId: 'outbox-processor-2',
@@ -10,6 +11,8 @@ const kafka = new Kafka({
 
 async function main() {
     const consumer = kafka.consumer({ groupId: 'main-worker-2' });
+    const users = await prisma.user.findMany()
+    console.log(users)
     await consumer.connect();
 
     await consumer.subscribe({ topic: TOPIC_NAME, fromBeginning: true })

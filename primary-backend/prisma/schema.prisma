@@ -18,17 +18,7 @@ model User {
   name     String
   email    String
   password String
-  zaps     Zap[]
-}
-
-model Zap {
-  id           String  @id @default(uuid())
-  triggerId    String
-  userId       Int
-  trigger      Trigger?
-  actions      Action[]
-  zapRuns      ZapRun[]
-  user         User @relation(fields: [userId], references: [id])
+  Triggers Trigger[]
 }
 
 model Trigger {
@@ -36,13 +26,19 @@ model Trigger {
   zapId       String  @unique
   triggerId   String
   type  AvailableTrigger @relation(fields: [triggerId], references: [id])
-  zap  Zap                @relation(fields: [zapId], references: [id])
+  
+  actions      Action[]
+
+  userId       Int
+  user         User @relation(fields: [userId], references: [id])
+  
+  zapRuns      Running[]
 }
 
 model Action {
   id        String  @id @default(uuid())
   zapId     String  
-  zap       Zap     @relation(fields: [zapId], references: [id])
+  zap       Trigger     @relation(fields: [zapId], references: [id])
   actionId  String
   type      AvailableAction @relation(fields: [actionId], references: [id])
   sortingOrder Int    @default(0)
@@ -60,16 +56,16 @@ model AvailableTrigger {
   triggers Trigger[]
 }
 
-model ZapRun {
+model Running {
   id           String @id @default(uuid())
   zapId        String
   metadata     Json
-  zap          Zap @relation(fields: [zapId], references: [id])
-  zapRunOutbox ZapRunOutbox?
+  zap          Trigger @relation(fields: [zapId], references: [id])
+  zapRunOutbox RunningOutbox?
 }
 
-model ZapRunOutbox {
+model RunningOutbox {
   id          String @id @default(uuid())
   zapRunId    String @unique
-  zapRun      ZapRun @relation(fields: [zapRunId], references: [id])
+  zapRun      Running @relation(fields: [zapRunId], references: [id])
 }
