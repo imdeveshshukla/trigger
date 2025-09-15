@@ -25,11 +25,14 @@ async function main() {
             topic: TOPIC_NAME,
             messages: pendingRows.map(r => {
                 return {
-                    value: r.zapRunId
+                    value: JSON.stringify({
+                        zapRunId: r.zapRunId,
+                        currentState: 0
+                    })
                 }
             })
         })  
-
+        //delete if send to producer
         await client.runningOutbox.deleteMany({
             where: {
                 id: {

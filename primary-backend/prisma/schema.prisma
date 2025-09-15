@@ -39,6 +39,7 @@ model Action {
   id        String  @id @default(uuid())
   zapId     String  
   zap       Trigger     @relation(fields: [zapId], references: [id])
+  params    Json
   actionId  String
   type      AvailableAction @relation(fields: [actionId], references: [id])
   sortingOrder Int    @default(0)

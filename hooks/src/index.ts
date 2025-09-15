@@ -6,23 +6,25 @@ const client = new PrismaClient();
 const app = express();
 app.use(express.json());
 
-// https://hooks.zapier.com/hooks/catch/17043103/22b8496/
-// password logic
-app.post("/hooks/catch/:userId/:zapId", async (req, res) => {
+// password logic- we can secure this endpoint only allowed can hit out hook
+app.post("/hooks/catch/:userId/:triggerId", async (req, res) => {
     const userId = req.params.userId;
-    const zapId = req.params.zapId;
+    const triggerId = req.params.triggerId;
     const body = req.body;
+    console.log("USER ID ",userId)
+    console.log("TRIGGERID ",triggerId)
+    // In this we need to verify that the user is the owner of the trigger
 
     // store in db a new trigger
     await client.$transaction(async tx => {
-        const run = await tx.zapRun.create({
+        const run = await tx.running.create({
             data: {
-                zapId: zapId,
+                zapId: triggerId,
                 metadata: body
             }
-        });;
+        });
 
-        await tx.zapRunOutbox.create({
+        await tx.runningOutbox.create({
             data: {
                 zapRunId: run.id
             }
