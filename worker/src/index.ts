@@ -106,6 +106,7 @@ async function main() {
           const lastState = (runningZap?.zap.actions.length || 1) -1 ;
           console.log("lastState  currentState");
           console.log(lastState+" "+currentState)
+          //move to next action
           if(currentState != lastState){
             producer.send({
               topic: TOPIC_NAME,

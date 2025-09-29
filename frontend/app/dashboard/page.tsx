@@ -6,11 +6,15 @@ import { useEffect, useState } from "react";
 import { BACKEND_URL } from "../config";
 import { LinkButton } from "@/components/buttons/LinkButton";
 import { useRouter } from "next/navigation";
+import { TriggerLogo } from "@/components/trigger-logo";
+import { Button } from "@/components/ui/button";
+import { Bell, LogOut, Settings, User } from "lucide-react";
 
 interface Zap {
     "id": string,
     "triggerId": string,
     "userId": number,
+    "zapId":string,
     "actions": {
         "id": string,
         "zapId": string,
@@ -21,14 +25,11 @@ interface Zap {
             "name": string
         }
     }[],
-    "trigger": {
+    "zapRuns": {
         "id": string,
         "zapId": string,
-        "triggerId": string,
-        "type": {
-            "id": string,
-            "name": string
-        }
+        "metadata": any,
+        "zapRunOutbox": any
     }
 }
 
@@ -44,6 +45,7 @@ function useZaps() {
         })
             .then(res => {
                 setZaps(res.data.zaps);
+                console.log(res.data);
                 setLoading(false)
             })
     }, []);
@@ -58,20 +60,44 @@ export default function() {
     const router = useRouter();
     
     return <div>
-        <Appbar />
+        <header className="border-b border-border/50 backdrop-blur-sm bg-background/80 sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center gap-3">
+              <TriggerLogo className="w-8 h-8 animate-pulse-slow" />
+              <span className="text-xl font-bold text-foreground">Trigger</span>
+            </div>
+
+            <div className="flex items-center gap-4">
+              <Button variant="ghost" size="sm" className="hover:scale-110 transition-transform duration-200">
+                <Bell className="w-4 h-4" />
+              </Button>
+              <Button variant="ghost" size="sm" className="hover:scale-110 transition-transform duration-200">
+                <Settings className="w-4 h-4" />
+              </Button>
+              <Button variant="ghost" size="sm" className="hover:scale-110 transition-transform duration-200">
+                <User className="w-4 h-4" />
+              </Button>
+              <Button variant="ghost" size="sm" className="hover:scale-110 transition-transform duration-200">
+                <LogOut className="w-4 h-4" />
+              </Button>
+            </div>
+          </div>
+        </div>
+      </header>
         <div className="flex justify-center pt-8">
-            <div className="max-w-screen-lg	 w-full">
+            <div className="max-w-5xl	 w-full">
                 <div className="flex justify-between pr-8 ">
                     <div className="text-2xl font-bold">
-                        My Zaps
+                        My Triggers
                     </div>
                     <DarkButton onClick={() => {
                         router.push("/zap/create");
                     }}>Create</DarkButton>
                 </div>
+        {loading ? "Loading..." : <div className="flex justify-center"> <ZapTable zaps={zaps} /> </div>}
             </div>
         </div>
-        {loading ? "Loading..." : <div className="flex justify-center"> <ZapTable zaps={zaps} /> </div>}
     </div>
 }
 
@@ -80,18 +106,18 @@ function ZapTable({ zaps }: {zaps: Zap[]}) {
 
     return <div className="p-8 max-w-screen-lg w-full">
         <div className="flex">
+                <div className="flex-1">id</div>
                 <div className="flex-1">Name</div>
-                <div className="flex-1">Last Edit</div>
-                <div className="flex-1">Running</div>
-                <div className="flex-1">Go</div>
+                <div className="flex-1">actions</div>
+                <div className="flex-1"></div>
         </div>
         {zaps.map(z => <div className="flex border-b border-t py-4">
-            <div className="flex-1">{z.trigger.type.name} {z.actions.map(x => x.type.name + " ")}</div>
             <div className="flex-1">{z.id}</div>
-            <div className="flex-1">Nov 13, 2023</div>
+            <div className="flex-1">{z.zapId}</div>
+            <div className="flex-1">{z.actions.length ?? 0}</div>
             <div className="flex-1"><LinkButton onClick={() => {
                     router.push("/zap/" + z.id)
-                }}>Go</LinkButton></div>
+                }}>View</LinkButton></div>
         </div>)}
     </div>
 }

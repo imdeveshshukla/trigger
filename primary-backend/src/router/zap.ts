@@ -18,48 +18,48 @@ router.post("/", authMiddleware, async (req, res) => {
         });
     }   
 
-    const zapId = await prismaClient.$transaction(async tx => {
-        const zap = await prismaClient.zap.create({
-            data: {
-                userId: parseInt(id),
-                triggerId: "",
-                actions: {
-                    create: parsedData.data.actions.map((x, index) => ({
-                        actionId: x.availableActionId,
-                        sortingOrder: index
-                    }))
-                }
-            }
-        })
+    // const zapId = await prismaClient.$transaction(async tx => {
+    //     const zap = await prismaClient.zap.create({
+    //         data: {
+    //             userId: parseInt(id),
+    //             triggerId: "",
+    //             actions: {
+    //                 create: parsedData.data.actions.map((x, index) => ({
+    //                     actionId: x.availableActionId,
+    //                     sortingOrder: index
+    //                 }))
+    //             }
+    //         }
+    //     })
 
-        const trigger = await tx.trigger.create({
-            data: {
-                triggerId: parsedData.data.availableTriggerId,
-                zapId: zap.id
-            }
-        });
+        // const trigger = await tx.trigger.create({
+        //     data: {
+        //         triggerId: parsedData.data.availableTriggerId,
+        //         zapId: zap.id
+        //     }
+        // });
 
-        await tx.zap.update({
-            where: {
-                id: zap.id
-            },
-            data: {
-                triggerId: trigger.id
-            }
-        })
+    //     await tx.zap.update({
+    //         where: {
+    //             id: zap.id
+    //         },
+    //         data: {
+    //             triggerId: trigger.id
+    //         }
+    //     })
 
-        return zap.id;
+    //     return zap.id;
 
-    })
+    // })
     return res.json({
-        zapId
+        "zapId0":"234"
     })
 })
 
 router.get("/", authMiddleware, async (req, res) => {
     // @ts-ignore
     const id = req.id;
-    const zaps = await prismaClient.zap.findMany({
+    const zaps = await prismaClient.trigger.findMany({
         where: {
             userId: id
         },
@@ -69,9 +69,9 @@ router.get("/", authMiddleware, async (req, res) => {
                     type: true
                }
             },
-            trigger: {
+            zapRuns: {
                 include: {
-                    type: true
+                    zapRunOutbox: true
                 }
             }
         }
@@ -87,7 +87,7 @@ router.get("/:zapId", authMiddleware, async (req, res) => {
     const id = req.id;
     const zapId = req.params.zapId;
 
-    const zap = await prismaClient.zap.findFirst({
+    const zap = await prismaClient.trigger.findFirst({
         where: {
             id: zapId,
             userId: id
@@ -98,11 +98,6 @@ router.get("/:zapId", authMiddleware, async (req, res) => {
                     type: true
                }
             },
-            trigger: {
-                include: {
-                    type: true
-                }
-            }
         }
     });
 
