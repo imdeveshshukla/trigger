@@ -3,7 +3,7 @@ import { Appbar } from "@/components/Appbar";
 import { DarkButton } from "@/components/buttons/DarkButton";
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { BACKEND_URL } from "../config";
+import { BACKEND_URL,HOOK_URL } from "../config";
 import { LinkButton } from "@/components/buttons/LinkButton";
 import { useRouter } from "next/navigation";
 import { TriggerLogo } from "@/components/trigger-logo";
@@ -107,17 +107,21 @@ function ZapTable({ zaps }: {zaps: Zap[]}) {
     return <div className="p-8 max-w-screen-lg w-full">
         <div className="flex">
                 <div className="flex-1">id</div>
-                <div className="flex-1">Name</div>
+                <div className="flex-1">User ID</div>
                 <div className="flex-1">actions</div>
                 <div className="flex-1"></div>
         </div>
         {zaps.map(z => <div className="flex border-b border-t py-4">
             <div className="flex-1">{z.id}</div>
-            <div className="flex-1">{z.zapId}</div>
+            <div className="flex-1">{z.userId}</div>
             <div className="flex-1">{z.actions.length ?? 0}</div>
             <div className="flex-1"><LinkButton onClick={() => {
-                    router.push("/zap/" + z.id)
-                }}>View</LinkButton></div>
+                    axios.post(`${HOOK_URL}/${z.userId}/${z.id}`,{
+                        'to':'deveshshukla1603@gmail.com',
+                        'body':'hey sending with in body',
+                        'subject':"noting"
+                    })
+                }}>Go</LinkButton></div>
         </div>)}
     </div>
 }

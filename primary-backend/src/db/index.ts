@@ -1,8 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 
-export const prismaClient = new PrismaClient({
-  log: ['query', 'info', 'warn', 'error'], // enables logging
-});
+export const prismaClient = new PrismaClient({});
 async function connectDb() {
   try {
     await prismaClient.$connect();

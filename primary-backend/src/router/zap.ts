@@ -16,8 +16,22 @@ router.post("/", authMiddleware, async (req, res) => {
         return res.status(411).json({
             message: "Incorrect inputs"
         });
-    }   
-
+    }
+    const trigger = await prismaClient.trigger.create({
+        data:{
+            userId: parseInt(id),
+            zapId:new Date().getTime().toString(),
+            triggerId:parsedData.data.availableTriggerId,
+            actions:{
+                create: parsedData.data.actions.map((x, index) => ({
+                    actionId: x.availableActionId,
+                    sortingOrder: index,
+                    params:x.actionMetadata
+                }))
+            },
+        }
+    });
+    console.log(trigger);
     // const zapId = await prismaClient.$transaction(async tx => {
     //     const zap = await prismaClient.zap.create({
     //         data: {
@@ -52,7 +66,7 @@ router.post("/", authMiddleware, async (req, res) => {
 
     // })
     return res.json({
-        "zapId0":"234"
+        "zapId":trigger.id
     })
 })
 

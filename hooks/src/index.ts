@@ -1,9 +1,10 @@
 import express from "express"
 import { PrismaClient } from "@prisma/client";
-
+import cors from 'cors';
 const client = new PrismaClient();
 
 const app = express();
+app.use(cors());
 app.use(express.json());
 
 // password logic- we can secure this endpoint only allowed can hit out hook
@@ -35,4 +36,4 @@ app.post("/hooks/catch/:userId/:triggerId", async (req, res) => {
     })
 })
 
-app.listen(3000);
+app.listen(3003);

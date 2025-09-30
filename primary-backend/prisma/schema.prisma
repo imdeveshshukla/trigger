@@ -14,7 +14,7 @@ datasource db {
 }
 
 model User {
-  id       Int    @id @default(autoincrement())
+  id       Int       @id @default(autoincrement())
   name     String
   email    String
   password String
@@ -22,51 +22,51 @@ model User {
 }
 
 model Trigger {
-  id          String  @id @default(uuid())
-  zapId       String  @unique
-  triggerId   String
-  type  AvailableTrigger @relation(fields: [triggerId], references: [id])
-  
-  actions      Action[]
+  id        String           @id @default(uuid())
+  zapId     String           @unique
+  triggerId String
+  type      AvailableTrigger @relation(fields: [triggerId], references: [id])
 
-  userId       Int
-  user         User @relation(fields: [userId], references: [id])
-  
-  zapRuns      Running[]
+  actions Action[]
+
+  userId Int
+  user   User @relation(fields: [userId], references: [id])
+
+  zapRuns Running[]
 }
 
 model Action {
-  id        String  @id @default(uuid())
-  zapId     String  
-  zap       Trigger     @relation(fields: [zapId], references: [id])
-  params    Json
-  actionId  String
-  type      AvailableAction @relation(fields: [actionId], references: [id])
-  sortingOrder Int    @default(0)
+  id           String          @id @default(uuid())
+  zapId        String
+  zap          Trigger         @relation(fields: [zapId], references: [id])
+  params       Json
+  actionId     String
+  type         AvailableAction @relation(fields: [actionId], references: [id])
+  sortingOrder Int             @default(0)
 }
 
 model AvailableAction {
-  id       String @id @default(uuid())
-  name     String
-  actions  Action[]
+  id      String   @id @default(uuid())
+  name    String
+  actions Action[]
 }
 
 model AvailableTrigger {
-  id       String @id @default(uuid())
-  name     String 
+  id       String    @id @default(uuid())
+  name     String
   triggers Trigger[]
 }
 
 model Running {
-  id           String @id @default(uuid())
+  id           String         @id @default(uuid())
   zapId        String
   metadata     Json
-  zap          Trigger @relation(fields: [zapId], references: [id])
+  zap          Trigger        @relation(fields: [zapId], references: [id])
   zapRunOutbox RunningOutbox?
 }
 
 model RunningOutbox {
-  id          String @id @default(uuid())
-  zapRunId    String @unique
-  zapRun      Running @relation(fields: [zapRunId], references: [id])
+  id       String  @id @default(uuid())
+  zapRunId String  @unique
+  zapRun   Running @relation(fields: [zapRunId], references: [id])
 }
