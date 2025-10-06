@@ -2,6 +2,8 @@
 import { Kafka } from "kafkajs";
 import { PrismaClient } from "@prisma/client";
 import sendEmail from "./services/sendEmail";
+import { parse } from "./utils/getParseMessage";
+import { JsonObject } from "@prisma/client/runtime/library";
 const TOPIC_NAME = "zap-events"
 const prisma = new PrismaClient();
 
@@ -25,17 +27,20 @@ async function main() {
         eachMessage: async ({ topic, partition, message }) => {
           // console.log(topic)
 
-          // console.log({
-          //   partition,
-          //   offset: message.offset,
-          //   value: message.value?.toString(),
-          // }) 
+          console.log({
+            partition,
+            offset: message.offset,
+            value: message.value?.toString(),
+          }) 
           await new Promise(r => setTimeout(r, 1000));
           if (!message.value) {
             console.error("Received message with null value");
             return;
           }
-          const {id, currentState } = JSON.parse(message.value.toString());
+          console.log("NEW MESSAGE ____________________________");
+          const {zapRunId:id, currentState } = JSON.parse(message.value.toString());
+          console.log("Current ID = > ",id)
+          console.log(currentState)
           const runningZap = await prisma.running.findFirst({
             where:{
               id
@@ -54,6 +59,8 @@ async function main() {
           })
           // console.log(currentState);
           console.log(runningZap)
+          console.log(runningZap?.zap)
+          console.log(runningZap?.zap.actions)
           let metadata: {[key: string]: string} = {};
           if(runningZap?.metadata){
             // console.log(runningZap?.metadata)
@@ -73,20 +80,9 @@ async function main() {
             console.log(crrAction);
             if(crrAction[0]?.type == 'Email'){
               console.log("Sending Email")
-              let validData = true;
-              if (crrAction[0]?.params && typeof crrAction[0].params === 'object' && !Array.isArray(crrAction[0].params)) {
-                for (const keys of Object.keys(crrAction[0].params)) {
-                    if (!metadata[keys]) {
-                      validData = false;
-                      console.log("Cant find the key in metadata")
-                    }
-                }
-              }
-              if(validData){
-                await sendEmail({ to: metadata['to'], subject: metadata['subject'], body: metadata['body'] })
-                console.log("Email sent")
-
-              }
+              const body = parse((crrAction[0].params as JsonObject)?.body as string,metadata['body']);
+              const to = parse((crrAction[0].params as JsonObject)?.to as string,metadata['to']);
+              await sendEmail({ to, subject: currentState ?? "Important", body });
             }
             else if(crrAction[0]?.type == 'Whatsapp Message'){
               console.log("Send WhatsApp")
@@ -103,16 +99,18 @@ async function main() {
             partition: partition,
             offset: (parseInt(message.offset) + 1).toString() // 5
           }])
+          console.log(runningZap?.zap?.actions)
           const lastState = (runningZap?.zap.actions.length || 1) -1 ;
           console.log("lastState  currentState");
           console.log(lastState+" "+currentState)
           //move to next action
           if(currentState != lastState){
+            console.log("Pushing to kafka again for next step")
             producer.send({
               topic: TOPIC_NAME,
               messages: [{
                       value: JSON.stringify({
-                          zapRunId: runningZap?.zapId,
+                          zapRunId: runningZap?.id,
                           currentState: currentState+1
                       })
                   }]

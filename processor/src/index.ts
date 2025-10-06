@@ -31,7 +31,7 @@ async function main() {
                     })
                 }
             })
-        })  
+        })
         //delete if send to producer
         await client.runningOutbox.deleteMany({
             where: {

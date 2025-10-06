@@ -26,4 +26,6 @@ export default async function sendEmail({to,subject,body}:emailTemplate){
         console.log({ message: "Error sending email", error });
       }
     });
+    console.log('Mail Sent to '+to+' with subject '+subject+" with body"+body);
+    
 }

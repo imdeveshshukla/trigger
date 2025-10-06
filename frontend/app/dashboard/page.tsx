@@ -107,19 +107,19 @@ function ZapTable({ zaps }: {zaps: Zap[]}) {
     return <div className="p-8 max-w-screen-lg w-full">
         <div className="flex">
                 <div className="flex-1">id</div>
-                <div className="flex-1">User ID</div>
+                <div className="flex-1">Webhook URL</div>
                 <div className="flex-1">actions</div>
                 <div className="flex-1"></div>
         </div>
-        {zaps.map(z => <div className="flex border-b border-t py-4">
+        {zaps.map(z => <div key={z.id} className="flex border-b border-t py-4">
             <div className="flex-1">{z.id}</div>
-            <div className="flex-1">{z.userId}</div>
+            <div className="flex-1">{`${HOOK_URL}/${z.userId}/${z.id}`}</div>
             <div className="flex-1">{z.actions.length ?? 0}</div>
             <div className="flex-1"><LinkButton onClick={() => {
                     axios.post(`${HOOK_URL}/${z.userId}/${z.id}`,{
                         'to':'deveshshukla1603@gmail.com',
-                        'body':'hey sending with in body',
-                        'subject':"noting"
+                        'body':'hey sending with in body ',
+                        'subject':" noting "
                     })
                 }}>Go</LinkButton></div>
         </div>)}
