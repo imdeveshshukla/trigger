@@ -25,6 +25,10 @@ async function main() {
     data: { name: "Whatsapp" }
   })
 
+  const rzpLink = await prisma.availableAction.create({
+    data: { name: "Razorpay-Link" }
+  })
+
   const emailAction = await prisma.availableAction.create({
     data: { name: "Email" }
   })
@@ -38,33 +42,6 @@ async function main() {
     }
   })
 
-
-  // Create a trigger for Alice
-  const aliceTrigger = await prisma.trigger.create({
-    data: {
-      zapId: "zap-123",
-      triggerId: hookTrigger.id,
-      userId: user1.id,
-    }
-  })
-
-  // Create actions for Alice’s trigger
-  await prisma.action.createMany({
-    data: [
-      {
-        zapId: aliceTrigger.id,
-        actionId: emailAction.id,
-        params: { to: "to", subject: "subject", body: "body" },
-        sortingOrder: 0,
-      },
-      {
-        zapId: aliceTrigger.id,
-        actionId: whatsAppAction.id,
-        params: { message: "message", phone: "phone" },
-        sortingOrder: 1,
-      },
-    ]
-  })
   console.log("🌱 Database seeded successfully!")
 }
 

@@ -22,9 +22,15 @@ interface Zap {
         "sortingOrder": number,
         "type": {
             "id": string,
+            "img":string,
             "name": string
         }
     }[],
+    "type": {
+            "id": string,
+            "img":string,
+            "name": string
+        },
     "zapRuns": {
         "id": string,
         "zapId": string,
@@ -103,23 +109,29 @@ export default function() {
 
 function ZapTable({ zaps }: {zaps: Zap[]}) {
     const router = useRouter();
-
+    console.log(zaps)
     return <div className="p-8 max-w-screen-lg w-full">
         <div className="flex">
-                <div className="flex-1">id</div>
+                <div className="flex-1">Trigger</div>
+                <div className="flex-1">Actions</div>
                 <div className="flex-1">Webhook URL</div>
-                <div className="flex-1">actions</div>
                 <div className="flex-1"></div>
         </div>
         {zaps.map(z => <div key={z.id} className="flex border-b border-t py-4">
-            <div className="flex-1">{z.id}</div>
+            <div className="flex-1"><img src={z.type.img} alt={z.type.name} width={50}/></div>
+            <div className="flex-1 flex w-full">
+                {z?.actions?.map(action =><img className="flex" src={action.type.img} alt={action.type.name} width={50}/>)}
+            </div>
             <div className="flex-1">{`${HOOK_URL}/${z.userId}/${z.id}`}</div>
-            <div className="flex-1">{z.actions.length ?? 0}</div>
             <div className="flex-1"><LinkButton onClick={() => {
                     axios.post(`${HOOK_URL}/${z.userId}/${z.id}`,{
-                        'to':'deveshshukla1603@gmail.com',
-                        'body':'hey sending with in body ',
-                        'subject':" noting "
+                        comment:{
+                            email:'deveshshukla1603@gmail.com',
+                            phone:'8090280964',
+                            name:'Rishi Shukla',
+                            amount:"1000",
+                            to:'imdeveshshukl@gmail.com'
+                        }
                     })
                 }}>Go</LinkButton></div>
         </div>)}

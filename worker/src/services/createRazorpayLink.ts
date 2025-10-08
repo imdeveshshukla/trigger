@@ -43,7 +43,7 @@ export async function createRazorpayLink(name:string, phone:string, email:string
         }
       }
     );
-
+    console.log(`RZP Link send to ${name} ${phone} ${email} ${amount}`);
   } catch (error:any) {
     console.error('Error creating Razorpay link:', error?.response?.data || error?.message);
     return { error: error?.response?.data || error?.message };

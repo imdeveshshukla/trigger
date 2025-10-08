@@ -11,11 +11,17 @@ router.post("/", authMiddleware, async (req, res) => {
     const id: string = req.id;
     const body = req.body;
     const parsedData = ZapCreateSchema.safeParse(body);
-    
     if (!parsedData.success) {
         return res.status(411).json({
             message: "Incorrect inputs"
         });
+    }
+    const user = await prismaClient.user.findUnique({
+    where: { id: parseInt(id) },
+    });
+
+    if (!user) {
+    return res.status(404).json({ message: "User not found" });
     }
     const trigger = await prismaClient.trigger.create({
         data:{
@@ -87,7 +93,8 @@ router.get("/", authMiddleware, async (req, res) => {
                 include: {
                     zapRunOutbox: true
                 }
-            }
+            },
+            type:true
         }
     });
 

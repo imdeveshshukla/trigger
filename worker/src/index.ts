@@ -4,6 +4,8 @@ import { PrismaClient } from "@prisma/client";
 import sendEmail from "./services/sendEmail";
 import { parse } from "./utils/getParseMessage";
 import { JsonObject } from "@prisma/client/runtime/library";
+import { createRazorpayLink } from "./services/createRazorpayLink";
+import { sendWhatsappMsg } from "./services/whatsapp";
 const TOPIC_NAME = "zap-events"
 const prisma = new PrismaClient();
 
@@ -57,35 +59,37 @@ async function main() {
               },
             }
           })
-          // console.log(currentState);
-          console.log(runningZap)
-          console.log(runningZap?.zap)
-          console.log(runningZap?.zap.actions)
           let metadata: {[key: string]: string} = {};
           if(runningZap?.metadata){
             // console.log(runningZap?.metadata)
             metadata = runningZap.metadata as { [key: string]: string };
           }
-          console.log(metadata)
           let crrAction=[];
           if(runningZap?.zap.actions){
             crrAction = runningZap?.zap?.actions.map(val=>{
               if(val.sortingOrder==currentState)
               {
-                console.log(val)
                 return {type:val.type.name,params:val.params};
               }
             });
             crrAction = crrAction.filter(x=>x!=undefined)
-            console.log(crrAction);
             if(crrAction[0]?.type == 'Email'){
               console.log("Sending Email")
-              const body = parse((crrAction[0].params as JsonObject)?.body as string,metadata['body']);
-              const to = parse((crrAction[0].params as JsonObject)?.to as string,metadata['to']);
+              const body = parse((crrAction[0].params as JsonObject)?.body as string,metadata);
+              const to = parse((crrAction[0].params as JsonObject)?.to as string,metadata);
               await sendEmail({ to, subject: currentState ?? "Important", body });
             }
-            else if(crrAction[0]?.type == 'Whatsapp Message'){
-              console.log("Send WhatsApp")
+            else if(crrAction[0]?.type == 'Whatsapp'){
+              console.log("Sending WhatsApp")
+              const phone = parse((crrAction[0].params as JsonObject)?.phone as string,metadata);
+              sendWhatsappMsg(phone);
+            }
+            else if(crrAction[0]?.type == 'Razorpay-link'){
+              const name = parse((crrAction[0].params as JsonObject)?.name as string,metadata);
+              const email = parse((crrAction[0].params as JsonObject)?.email as string,metadata);
+              const phone = parse((crrAction[0].params as JsonObject)?.phone as string,metadata);
+              const amount = Number(parse((crrAction[0].params as JsonObject)?.amount as string,metadata));
+              await createRazorpayLink(name,phone,email,amount);
             }
             else{
               console.log('Unavailable Action')
@@ -99,7 +103,6 @@ async function main() {
             partition: partition,
             offset: (parseInt(message.offset) + 1).toString() // 5
           }])
-          console.log(runningZap?.zap?.actions)
           const lastState = (runningZap?.zap.actions.length || 1) -1 ;
           console.log("lastState  currentState");
           console.log(lastState+" "+currentState)

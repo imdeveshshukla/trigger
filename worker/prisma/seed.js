@@ -13,20 +13,24 @@ async function main() {
   await prisma.availableTrigger.deleteMany()
 
   // Create available triggers and actions
-  const emailTrigger = await prisma.availableTrigger.create({
-    data: { name: "Email" }
-  })
+  // const emailTrigger = await prisma.availableTrigger.create({
+  //   data: { name: "Email",img:"https://cdn.imgbin.com/2/20/10/imgbin-gmail-email-computer-icons-google-logo-gmail-hpibJEXfpsUbqciFff9cRzHss.jpg" }
+  // })
 
   const hookTrigger = await prisma.availableTrigger.create({
-    data: { name: "Hook" }
+    data: { name: "Hook",img:"https://i.sstatic.net/S3SNU.jpg" }
   })
 
   const whatsAppAction = await prisma.availableAction.create({
-    data: { name: "Whatsapp" }
+    data: { name: "Whatsapp",img:"https://lookaside.fbsbx.com/elementpath/media/?media_id=595945097590761&version=1749126188&transcode_extension=webp" }
   })
 
+  const rzpAction = await prisma.availableAction.create({
+    data: { name: "Razorpay-link",img:"https://d6xcmfyh68wv8.cloudfront.net/newsroom-content/uploads/2024/05/Razorpay-Logo.jpg" }
+  }) 
+
   const emailAction = await prisma.availableAction.create({
-    data: { name: "Email" }
+    data: { name: "Email",img:"https://cdn.imgbin.com/2/20/10/imgbin-gmail-email-computer-icons-google-logo-gmail-hpibJEXfpsUbqciFff9cRzHss.jpg" }
   })
 
   // Create users
@@ -38,33 +42,6 @@ async function main() {
     }
   })
 
-
-  // Create a trigger for Alice
-  const aliceTrigger = await prisma.trigger.create({
-    data: {
-      zapId: "zap-123",
-      triggerId: hookTrigger.id,
-      userId: user1.id,
-    }
-  })
-
-  // Create actions for Alice’s trigger
-  await prisma.action.createMany({
-    data: [
-      {
-        zapId: aliceTrigger.id,
-        actionId: emailAction.id,
-        params: { to: "to", subject: "subject", body: "body" },
-        sortingOrder: 0,
-      },
-      {
-        zapId: aliceTrigger.id,
-        actionId: whatsAppAction.id,
-        params: { message: "message", phone: "phone" },
-        sortingOrder: 1,
-      },
-    ]
-  })
   console.log("🌱 Database seeded successfully!")
 }
 

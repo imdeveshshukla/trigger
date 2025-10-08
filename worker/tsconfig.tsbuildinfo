@@ -1,1 +1,1 @@
-{"root":["./src/index.ts","./src/services/createrazorpaylink.ts","./src/services/sendemail.ts","./src/services/sendsol.ts","./src/utils/getparsemessage.ts"],"version":"5.9.2"}
+{"root":["./src/index.ts","./src/services/createrazorpaylink.ts","./src/services/sendemail.ts","./src/services/sendsol.ts","./src/services/whatsapp.ts","./src/utils/getparsemessage.ts"],"version":"5.9.2"}
