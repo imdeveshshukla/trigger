@@ -82,7 +82,8 @@ async function main() {
             else if(crrAction[0]?.type == 'Whatsapp'){
               console.log("Sending WhatsApp")
               const phone = parse((crrAction[0].params as JsonObject)?.phone as string,metadata);
-              sendWhatsappMsg(phone);
+              const body = parse((crrAction[0].params as JsonObject)?.body as string,metadata);
+              sendWhatsappMsg(phone, body);
             }
             else if(crrAction[0]?.type == 'Razorpay-link'){
               const name = parse((crrAction[0].params as JsonObject)?.name as string,metadata);
