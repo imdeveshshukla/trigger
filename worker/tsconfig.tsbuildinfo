@@ -1,1 +1,1 @@
-{"root":["./src/index.ts","./src/services/createrazorpaylink.ts","./src/services/sendemail.ts","./src/services/sendsol.ts","./src/services/whatsapp.ts","./src/utils/getparsemessage.ts"],"version":"5.9.2"}
+{"root":["./src/index.ts","./src/services/createRazorpayLink.ts","./src/services/sendEmail.ts","./src/services/sendSol.ts","./src/services/whatsapp.ts","./src/utils/getParseMessage.ts"],"version":"5.9.2"}
